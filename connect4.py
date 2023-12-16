@@ -1,6 +1,8 @@
 #add them nay:
 #1.neu check_move ma false thi sao -> print nho user chon lai column 
-#2. input la chu?3
+#2. input la chu?
+#3 neu cot do het avail position -> ask to choose another col
+#4 neu full bang --> end game 
 
 #import necessary libs
 import numpy as np
@@ -8,54 +10,43 @@ import numpy as np
 ROW_NUM = 6
 COL_NUM = 7
 
-# class Game:
-#     def __init__(self, rows, cols) -> None: 
-#         self.rows = rows # this represents the number of rows of the board
-#         self.cols = cols # this represents the number of columns of the board
-#         self.mat = np.zeros((self.rows, self.cols))
-#         self.turn = 0 # this represents whose turn it is (1 for player 1, 2 for player 2)
-#         self.wins = 0 # this represents the number of consecutive disks you need to force in order to win
-
 class Game:
-    rows = ROW_NUM # this represents the number of rows of the board
-    cols = COL_NUM # this represents the number of columns of the board
-    mat = np.zeros((rows, cols))
-    turn = 0 # this represents whose turn it is (1 for player 1, 2 for player 2)
-    wins = 0 # this represents the number of consecutive disks you need to force in order to win
+    def __init__(self, rows, cols) -> None: 
+        self.rows = rows # this represents the number of rows of the board
+        self.cols = cols # this represents the number of columns of the board
+        self.mat = np.zeros((self.rows, self.cols))
+        self.turn = 0 # this represents whose turn it is (1 for player 1, 2 for player 2)
+        self.wins = 0 # this represents the number of consecutive disks you need to force in order to win
+        self.playing = True
 
 def main():
-    game = Game()  # my_game is an instance of class Game
+    game = Game(ROW_NUM, COL_NUM)  # my_game is an instance of class Game
     # my_game_2 = Game()  # another instance
     print(np.flip(game.mat,0))
-    playing=True
     turn = 0 
     
-    while playing:
+    while game.playing:
         #Ask for Player 1 input
         if turn == 0:
-            col = int(input("Player 1 please pick a column (0-6): "))
-            while not is_valid_input(col):
-                col = int(input("Player 1 please pick a column again (0-6): "))
-            if check_move(game.mat, col):
-                row = apply_move(game.mat, col, 1)
-                if check_victory(game.mat, 1):
-                    print("Congrats! Player 1 win")
-                    playing = False
+            start(game, 1)
 
         #Ask for Player 2 input
         else:
-            col =  int(input("Player 2 please pick a column (0-6): "))
-            while not is_valid_input(col):
-                col = int(input("Player 2 please pick a column again (0-6): "))
-            if check_move(game.mat, col):
-                row = apply_move(game.mat, col, 2)
-                if check_victory(game.mat, 2):
-                    print("Congrats! Player 2 win")
-                    playing = False
+           start(game, 2)
 
         display_board(game.mat)
         turn += 1 
         turn = turn % 2
+
+def start(game, player):
+    col = int(input(f"Player {player} please pick a column (0-6): "))
+    while not is_valid_input(col):
+        col = int(input(f"Player {player} please pick a column again (0-6): "))
+    if check_move(game.mat, col):
+        row = apply_move(game.mat, col, player)
+        if check_victory(game.mat, player):
+            print(f"Congrats! Player {player} win")
+            game.playing = False
 
 def is_valid_input(col):
     if col not in range(COL_NUM):
