@@ -80,7 +80,10 @@ def apply_move(mat, action, col, player):
                 mat[r][col] = player
                 return r
     else:
-        mat[0][col] = 0
+        for r in range(ROW_NUM-1):
+            mat[r][col] = mat[r+1][col]
+        
+        mat[ROW_NUM-1][col] = 0
 
 #rules 
 def check_victory(mat, player):
