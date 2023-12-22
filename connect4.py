@@ -74,22 +74,9 @@ def computer_mode(game):
             player = 2
             print("AI takes turn")
             if level == 1:
-                #random move
-                while game.playing:
-                    action = random.choice(["a", "r"])
-                    # action = "a"
-                    col = random.randint(0, COL_NUM-1)
-                    if check_input(game.mat, player, action, col):
-                        if check_move(game.mat, action, col, player):
-                            apply_move(game.mat, action, col, player)
-                            if check_victory(game.mat, player):
-                                print(f"Yay!!! AI wins")
-                                game.playing = False  
-                        break    
-                    else: 
-                        print("Co len AI oi/Invalid input. Try again.")  
+                random_move(game, game.mat, player)
             elif level == 2:
-                # best_move()
+                best_move(game, game.mat)
                 print("level 2")
             elif level == 3:
                 # minimax()
@@ -115,6 +102,56 @@ def mutual_flow(game, player):
         else: 
             print("Co len dinh oi/Invalid input. Try again.")       
 
+def random_move(game, mat, player):
+    while game.playing:
+        # action = random.choice(["a", "r"])
+        action = "a"
+        col = random.randint(0, COL_NUM-1)
+        if check_input(mat, player, action, col):
+            if check_move(mat, action, col, player):
+                apply_move(mat, action, col, player)
+                if check_victory(mat, player):
+                    print(f"Yay!!! AI wins")
+                    game.playing = False  
+            break    
+        else: 
+            print("Co len AI oi/Invalid input. Try again.") 
+
+def best_move(game, mat):
+    action =  "a"
+
+    #Check if AI can win immediately
+    for c in range(COL_NUM):
+        temp_mat=mat.copy()
+        apply_move(temp_mat, action, c, 2)
+        if check_victory(temp_mat, 2):
+            apply_move(mat, action, c, 2)
+            print(f"Yay!!! AI wins")
+            game.playing = False  
+            break 
+
+    #Check if Player 1 can win in the next move
+    else:
+        for c in range(COL_NUM):
+            temp_mat=mat.copy()
+            apply_move(temp_mat, action, c, 1)
+            if check_victory(temp_mat, 1):
+                apply_move(mat, action, c, 2)
+                break
+    
+        #If neither condition is satisfied, choose random
+        else: 
+            random_move(game, mat, 2)
+
+    # valid_locs = []
+    # action = "a"
+    # for c in range(COL_NUM):
+    #     if check_move(mat, action, c, 2):
+    #         valid_locs.append(c)
+    # best_score = -1000
+    # for c in valid_locs:
+
+
 def get_input(mat, player):
     while True: 
         print(f"Player {player}, which action you want to take?")
@@ -139,7 +176,7 @@ def check_input(mat, player, action, col):
         return True
 
 #check wether the highest col still free
-def check_move(mat, action, col, player):
+def check_move(mat, action, col, player = None):
     if action == "a":
         return mat[ROW_NUM-1][col] == 0
     else:
