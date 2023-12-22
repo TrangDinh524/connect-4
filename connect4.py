@@ -52,30 +52,56 @@ def two_player_mode(game):
 
 def computer_mode(game):
     print("Welcome to AI mode ahihihihi. Which level you wanna play? (1-3)")
-    level = int(input("(1)Easy (2)Medium (3)Hard: "))
+    level = 0
     turn = 0 
-    while True:
+    while True: 
+        try: 
+            level = int(input("(1)Easy (2)Medium (3)Hard: "))
+            if level not in range(1, 4):
+                print("Invalid input for level. Try again!")
+            else:
+                break
+        except ValueError:
+            print("Invalid input. Please enter a valid integer (1-3).")
+
+    while game.playing:
         #Ask for Player 1 input
         if turn == 0:
             mutual_flow(game, 1)
 
-        #AI input
+        #AI input, with only "add" action 
         else:
+            player = 2
+            print("AI takes turn")
             if level == 1:
                 #random move
-                action = random.choice(["a", "r"])
-                col = random.randint(0, COLUMN_COUNT-1)
-                mutual_flow_ai(game, 2, action, col)
+                while game.playing:
+                    action = random.choice(["a", "r"])
+                    # action = "a"
+                    col = random.randint(0, COL_NUM-1)
+                    if check_input(game.mat, player, action, col):
+                        if check_move(game.mat, action, col, player):
+                            apply_move(game.mat, action, col, player)
+                            if check_victory(game.mat, player):
+                                print(f"Yay!!! AI wins")
+                                game.playing = False  
+                        break    
+                    else: 
+                        print("Co len AI oi/Invalid input. Try again.")  
             elif level == 2:
-                best_move()
-            else:
-                minimax()
-
+                # best_move()
+                print("level 2")
+            elif level == 3:
+                # minimax()
+                print("level 3")
+            else: 
+                print("Invalid input. Try again!")
             #mutual_flow(game, 2)
 
         display_board(game.mat)
         turn += 1 
         turn = turn % 2
+
 def mutual_flow(game, player):
     while True:
         action, col = get_input(game, player)
@@ -88,6 +114,17 @@ def mutual_flow(game, player):
             break 
         else: 
             print("Co len dinh oi/Invalid input. Try again.")       
+
+# def flow_ai(game, player, action, col):
+#     if check_input(game.mat, player, action, col):
+#         if check_move(game.mat, action, col, player):
+#             apply_move(game.mat, action, col, player)
+#             if check_victory(game.mat, player):
+#                 print(f"Congrats! Player {player} win")
+#                 game.playing = False  
+            
+#     else: 
+#         print("Co len AI oi/Invalid input. Try again.")   
 
 def get_input(mat, player):
     while True: 
