@@ -1,8 +1,10 @@
 #add them nay:
 #4 neu full bang --> end game 
+#5 neu input la a 2' --> valueerror --> in lai dong "welcome connect 4...." :( fix it plz
 
 #import necessary libs
 import numpy as np
+import random
 
 ROW_NUM = 6
 COL_NUM = 7
@@ -17,54 +19,98 @@ class Game:
         self.playing = True
 
 def main():
-    game = Game(ROW_NUM, COL_NUM)  # my_game is an instance of class Game
-    # my_game_2 = Game()  # another instance
+    game = Game(ROW_NUM, COL_NUM) 
     print(np.flip(game.mat,0))
-    turn = 0 
     
+    while game.playing: 
+        try: 
+            print("Welcome to Connect 4! Let's play together!")
+            mode = int(input("How many player? (1 or 2): "))
+            if mode == 1:
+                computer_mode(game)
+            elif mode == 2:
+                two_player_mode(game)
+            else: 
+                print("Invalid input. Try again!")
+        except ValueError:
+            print("Invalid input. Please enter a valid integer (1-2).")
+
+def two_player_mode(game):
+    turn = 0 
     while game.playing:
         #Ask for Player 1 input
         if turn == 0:
-            start(game, 1)
+            mutual_flow(game, 1)
 
         #Ask for Player 2 input
         else:
-           start(game, 2)
+            mutual_flow(game, 2)
 
         display_board(game.mat)
         turn += 1 
         turn = turn % 2
 
-def start(game, player):
-    action, col = check_input(game.mat, player)
-    if check_move(game.mat, action, col, player):
-        apply_move(game.mat, action, col, player)
-        if check_victory(game.mat, player):
-            print(f"Congrats! Player {player} win")
-            game.playing = False
-
-def check_input(mat, player):
+def computer_mode(game):
+    print("Welcome to AI mode ahihihihi. Which level you wanna play? (1-3)")
+    level = int(input("(1)Easy (2)Medium (3)Hard: "))
+    turn = 0 
     while True:
-        try: 
-            print(f"Player {player}, which mode you want to choose?")
-            action = input(f"\"a\" for add-in, \"r\" for remove: ").lower()
-            if action == "a" or action == "r":
-                while True:
-                    try: 
-                        col = int(input(f"Player {player} please pick a column to add-in (0-6): "))
-                        if col not in range(COL_NUM):
-                            print("Invalid input. Try again.")
-                        elif not check_move(mat, action, col, player):
-                            print("No available position in this column. Please try another col!")    
-                        else:
-                            return action, col
-                    except ValueError:
-                        print("Invalid input. Please enter a valid integer.")
-            else:
-                print("Invalid input. Try again.")
-        except Exception as e:
-            print(f"An error occurred: {e}")
+        #Ask for Player 1 input
+        if turn == 0:
+            mutual_flow(game, 1)
 
+        #AI input
+        else:
+            if level == 1:
+                #random move
+                action = random.choice(["a", "r"])
+                col = random.randint(0, COLUMN_COUNT-1)
+                mutual_flow_ai(game, 2, action, col)
+            elif level == 2:
+                best_move()
+            else:
+                minimax()
+
+            #mutual_flow(game, 2)
+
+        display_board(game.mat)
+        turn += 1 
+        turn = turn % 2
+def mutual_flow(game, player):
+    while True:
+        action, col = get_input(game, player)
+        if check_input(game.mat, player, action, col):
+            if check_move(game.mat, action, col, player):
+                apply_move(game.mat, action, col, player)
+                if check_victory(game.mat, player):
+                    print(f"Congrats! Player {player} win")
+                    game.playing = False  
+            break 
+        else: 
+            print("Co len dinh oi/Invalid input. Try again.")       
+
+def get_input(mat, player):
+    while True: 
+        print(f"Player {player}, which action you want to take?")
+        ask = input(f"\"a\" for add-in, \"r\" for remove and (0-6) for col, seperate by ' ': ").lower().split()
+        if not len(ask) == 2:
+            print("Wrong format. Try again")
+            continue
+        else:
+            return ask[0], int(ask[1])
+
+def check_input(mat, player, action, col):
+    if not (action == 'a' or action == 'r'):
+        print("Invalid input letter. Try again.")
+        return False
+    elif col not in range(COL_NUM):
+        print("Invalid input col. Try again.")
+        return False
+    elif not check_move(mat, action, col, player):
+        print("No available position in this column. Please try another col!")  
+        return False  
+    else:
+        return True
 
 #check wether the highest col still free
 def check_move(mat, action, col, player):
@@ -112,8 +158,6 @@ def check_victory(mat, player):
             if mat[r][c] == mat[r-1][c+1] == mat[r-2][c+2] == mat[r-3][c+3] and mat[r][c] == player:
                 return True
 
-def computer_move(game,level):
-    pass
 #change row index of board + print board
 def display_board(mat):
     print(np.flip(mat, 0))
