@@ -115,17 +115,6 @@ def mutual_flow(game, player):
         else: 
             print("Co len dinh oi/Invalid input. Try again.")       
 
-# def flow_ai(game, player, action, col):
-#     if check_input(game.mat, player, action, col):
-#         if check_move(game.mat, action, col, player):
-#             apply_move(game.mat, action, col, player)
-#             if check_victory(game.mat, player):
-#                 print(f"Congrats! Player {player} win")
-#                 game.playing = False  
-            
-#     else: 
-#         print("Co len AI oi/Invalid input. Try again.")   
-
 def get_input(mat, player):
     while True: 
         print(f"Player {player}, which action you want to take?")
